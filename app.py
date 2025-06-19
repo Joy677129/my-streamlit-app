@@ -91,11 +91,11 @@ def blend_colors_3(color1, color2, color3):
     return tuple((c1 + c2 + c3) / 3 for c1, c2, c3 in zip(rgb1, rgb2, rgb3))
 
 # --- ChatGPT API Integration for Set Definition Parsing ---
-openai_api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY", None)
-if not openai_api_key:
-    st.warning("OPENAI_API_KEY not found. GPT-based set definition validation will not work.")
-else:
-    openai.api_key = openai_api_key
+# openai_api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY", None)
+# if not openai_api_key:
+#     st.warning("OPENAI_API_KEY not found. GPT-based set definition validation will not work.")
+# else:
+#     openai.api_key = openai_api_key
 
 @st.cache_data(show_spinner=False)
 def interpret_set_definition_via_gpt(user_input: str) -> dict:
