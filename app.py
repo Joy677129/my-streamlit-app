@@ -97,52 +97,52 @@ def blend_colors_3(color1, color2, color3):
 # else:
 #     openai.api_key = openai_api_key
 
-@st.cache_data(show_spinner=False)
-def interpret_set_definition_via_gpt(user_input: str) -> dict:
-    """Call ChatGPT API to parse arbitrary set definition, return dict with keys: valid, type, elements, description, note."""
-    system_msg = "You are a helper that interprets mathematical set definitions given in arbitrary string form. Respond ONLY with valid JSON."
-    examples = [
-        {"input": "1, 2, 2, 3", "output": {"valid": True, "type": "roster", "elements": [1, 2, 3], "description": "Finite set with elements 1, 2, 3 (duplicates ignored)", "note": "Duplicates removed"}},
-        {"input": "5-10", "output": {"valid": True, "type": "range", "elements": [5, 6, 7, 8, 9, 10], "description": "Integers from 5 to 10 inclusive", "note": ""}},
-        {"input": "{ x | x is even and x < 10 }", "output": {"valid": True, "type": "predicate", "elements": [0, 2, 4, 6, 8], "description": "Even non-negative integers less than 10", "note": "Enumerated finite elements"}},
-        {"input": "all primes", "output": {"valid": True, "type": "predicate", "elements": None, "description": "Set of all prime numbers", "note": "Infinite set; cannot enumerate fully"}},
-        {"input": "{1, {2}}", "output": {"valid": False, "type": "invalid", "elements": None, "description": "", "note": "Nested sets not supported"}}
-    ]
-    messages = [{"role": "system", "content": system_msg}]
-    for ex in examples:
-        prompt_user = f"Input: \"{ex['input']}\"\nJSON:"
-        messages.append({"role": "user", "content": prompt_user})
-        messages.append({"role": "assistant", "content": json.dumps(ex['output'])})
-    prompt_actual = f"Input: \"{user_input}\"\nJSON:"
-    messages.append({"role": "user", "content": prompt_actual})
-    try:
-        resp = openai.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=messages,
-            temperature=0.0,
-            max_tokens=512,
-        )
-        content = resp.choices[0].message.content.strip()
-        data = json.loads(content)
-        if not isinstance(data, dict) or 'valid' not in data:
-            return {"valid": False, "type": "unknown", "elements": None, "description": "", "note": "Invalid response format"}
-        elems = data.get("elements")
-        if isinstance(elems, list):
-            parsed = []
-            for e in elems:
-                try:
-                    parsed.append(int(e))
-                except Exception:
-                    parsed.append(e)
-            data["elements"] = parsed
-        return data
-    except Exception as e:
-        err_str = str(e)
-        if 'insufficient_quota' in err_str or 'quota' in err_str.lower():
-            note = "Insufficient quota or quota exceeded. GPT-based validation unavailable."
-        else:
-            note = f"Error: {e}"
-        return {"valid": False, "type": "error", "elements": None, "description": "", "note": note}
+# @st.cache_data(show_spinner=False)
+# def interpret_set_definition_via_gpt(user_input: str) -> dict:
+#     """Call ChatGPT API to parse arbitrary set definition, return dict with keys: valid, type, elements, description, note."""
+#     system_msg = "You are a helper that interprets mathematical set definitions given in arbitrary string form. Respond ONLY with valid JSON."
+#     examples = [
+#         {"input": "1, 2, 2, 3", "output": {"valid": True, "type": "roster", "elements": [1, 2, 3], "description": "Finite set with elements 1, 2, 3 (duplicates ignored)", "note": "Duplicates removed"}},
+#         {"input": "5-10", "output": {"valid": True, "type": "range", "elements": [5, 6, 7, 8, 9, 10], "description": "Integers from 5 to 10 inclusive", "note": ""}},
+#         {"input": "{ x | x is even and x < 10 }", "output": {"valid": True, "type": "predicate", "elements": [0, 2, 4, 6, 8], "description": "Even non-negative integers less than 10", "note": "Enumerated finite elements"}},
+#         {"input": "all primes", "output": {"valid": True, "type": "predicate", "elements": None, "description": "Set of all prime numbers", "note": "Infinite set; cannot enumerate fully"}},
+#         {"input": "{1, {2}}", "output": {"valid": False, "type": "invalid", "elements": None, "description": "", "note": "Nested sets not supported"}}
+#     ]
+#     messages = [{"role": "system", "content": system_msg}]
+#     for ex in examples:
+#         prompt_user = f"Input: \"{ex['input']}\"\nJSON:"
+#         messages.append({"role": "user", "content": prompt_user})
+#         messages.append({"role": "assistant", "content": json.dumps(ex['output'])})
+#     prompt_actual = f"Input: \"{user_input}\"\nJSON:"
+#     messages.append({"role": "user", "content": prompt_actual})
+#     try:
+#         resp = openai.chat.completions.create(
+#             model="gpt-4o-mini",
+#             messages=messages,
+#             temperature=0.0,
+#             max_tokens=512,
+#         )
+#         content = resp.choices[0].message.content.strip()
+#         data = json.loads(content)
+#         if not isinstance(data, dict) or 'valid' not in data:
+#             return {"valid": False, "type": "unknown", "elements": None, "description": "", "note": "Invalid response format"}
+#         elems = data.get("elements")
+#         if isinstance(elems, list):
+#             parsed = []
+#             for e in elems:
+#                 try:
+#                     parsed.append(int(e))
+#                 except Exception:
+#                     parsed.append(e)
+#             data["elements"] = parsed
+#         return data
+#     except Exception as e:
+#         err_str = str(e)
+#         if 'insufficient_quota' in err_str or 'quota' in err_str.lower():
+#             note = "Insufficient quota or quota exceeded. GPT-based validation unavailable."
+#         else:
+#             note = f"Error: {e}"
+#         return {"valid": False, "type": "error", "elements": None, "description": "", "note": note}
 
 # --- Sidebar Configuration ---
 st.sidebar.header("Configuration")
@@ -322,37 +322,37 @@ if show_powerset:
                 st.write(formatted)
 
 # --- Slideshow Viewer Section ---
-if show_slideshow:
-    st.sidebar.subheader("Slideshow Viewer Settings")
-    st.subheader("Slideshow Viewer")
-    uploaded_file = st.file_uploader("Upload a .pptx file", type=["pptx"] )
-    if uploaded_file:
-        file_bytes = uploaded_file.read()
-        st.download_button("Download Uploaded Slideshow", data=file_bytes, file_name=uploaded_file.name, mime="application/vnd.openxmlformats-officedocument.presentationml.presentation")
-        if PPTX_AVAILABLE:
-            st.markdown("**Slide contents:**")
-            try:
-                prs = Presentation(BytesIO(file_bytes))
-                for i, slide in enumerate(prs.slides, start=1):
-                    texts = []
-                    for shape in slide.shapes:
-                        if hasattr(shape, "text_frame") and shape.text_frame is not None:
-                            for para in shape.text_frame.paragraphs:
-                                line = para.text.strip()
-                                if line:
-                                    texts.append(line)
-                    if texts:
-                        st.markdown(f"**Slide {i}:**")
-                        for line in texts:
-                            st.write(f"- {line}")
-                    else:
-                        st.markdown(f"**Slide {i}:** (no extractable text)")
-            except Exception as e:
-                st.error(f"Failed to parse slideshow: {e}")
-        else:
-            st.warning("python-pptx not installed; cannot extract slide contents. Install via: pip install python-pptx")
-    else:
-        st.info("Please upload a .pptx file to view its contents.")
+# if show_slideshow:
+#     st.sidebar.subheader("Slideshow Viewer Settings")
+#     st.subheader("Slideshow Viewer")
+#     uploaded_file = st.file_uploader("Upload a .pptx file", type=["pptx"] )
+#     if uploaded_file:
+#         file_bytes = uploaded_file.read()
+#         st.download_button("Download Uploaded Slideshow", data=file_bytes, file_name=uploaded_file.name, mime="application/vnd.openxmlformats-officedocument.presentationml.presentation")
+#         if PPTX_AVAILABLE:
+#             st.markdown("**Slide contents:**")
+#             try:
+#                 prs = Presentation(BytesIO(file_bytes))
+#                 for i, slide in enumerate(prs.slides, start=1):
+#                     texts = []
+#                     for shape in slide.shapes:
+#                         if hasattr(shape, "text_frame") and shape.text_frame is not None:
+#                             for para in shape.text_frame.paragraphs:
+#                                 line = para.text.strip()
+#                                 if line:
+#                                     texts.append(line)
+#                     if texts:
+#                         st.markdown(f"**Slide {i}:**")
+#                         for line in texts:
+#                             st.write(f"- {line}")
+#                     else:
+#                         st.markdown(f"**Slide {i}:** (no extractable text)")
+#             except Exception as e:
+#                 st.error(f"Failed to parse slideshow: {e}")
+#         else:
+#             st.warning("python-pptx not installed; cannot extract slide contents. Install via: pip install python-pptx")
+#     else:
+#         st.info("Please upload a .pptx file to view its contents.")
 
 # --- Video Viewer Section ---
 if show_video:
