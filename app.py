@@ -148,7 +148,7 @@ def interpret_set_definition_via_gpt(user_input: str) -> dict:
 st.sidebar.header("Configuration")
 show_venn = st.sidebar.checkbox("Enable Venn Diagram Operations", True)
 show_powerset = st.sidebar.checkbox("Enable Power Set Generator", False)
-# show_slideshow = st.sidebar.checkbox("Enable Slideshow Viewer", False)
+show_slideshow = st.sidebar.checkbox("Enable Slideshow Viewer", False)
 show_video = st.sidebar.checkbox("Set Theorums with Proof", False)
 show_validator = st.sidebar.checkbox("Enable Set Definition Validator", False)
 
