@@ -373,65 +373,65 @@ if show_video:
             st.warning(f"Video file not found: {path}")
 
 # --- Set Definition Validator Section ---
-if show_validator:
-    st.sidebar.subheader("Set Definition Validator")
-    user_def = st.text_input("Enter arbitrary set definition or description")
-    if user_def:
-        if not openai_api_key:
-            st.error("Cannot validate via GPT because OPENAI_API_KEY is not configured.")
-        else:
-            with st.spinner("Interpreting set definition via ChatGPT..."):
-                result = interpret_set_definition_via_gpt(user_def)
-            note = result.get("note", "")
-            if result.get("valid"):
-                st.success("Recognized as a valid set definition.")
-                st.write("**Type:**", result.get("type"))
-                desc = result.get("description")
-                if desc:
-                    st.write("**Description:**", desc)
-                elems = result.get("elements")
-                if elems is not None:
-                    st.write("**Enumerated Elements:**", format_set(set(elems)))
-                    test_val = st.text_input("Test membership: enter a value", key="membership_test")
-                    if test_val:
-                        tv = parse_element(test_val)
-                        if tv in elems:
-                            st.success(f"{tv!r} ∈ the set")
-                        else:
-                            st.info(f"{tv!r} ∉ the set")
-                else:
-                    st.write("**Elements:** (Infinite or not enumerated)")
-                    member_q = st.text_input("Test membership via GPT (enter a value)", key="gpt_member_test")
-                    if member_q:
-                        if 'Insufficient quota' in note:
-                            st.error("Cannot perform membership query: insufficient quota.")
-                        else:
-                            prompt = (
-                                f"Determine if {member_q!r} is an element of the set defined by: {user_def!r}. Respond ONLY with JSON: { 'member': True/False, 'explanation': '...' }."  # noqa: E501
-                            )
-                            try:
-                                resp = openai.chat.completions.create(
-                                    model="gpt-4o-mini",
-                                    messages=[
-                                        {"role": "system", "content": "You are a helpful assistant for set membership queries."},
-                                        {"role": "user", "content": prompt}
-                                    ],
-                                    temperature=0.0,
-                                    max_tokens=200,
-                                )
-                                content = resp.choices[0].message.content.strip()
-                                mem_data = json.loads(content)
-                                if mem_data.get("member"):
-                                    st.success(f"GPT: {member_q!r} ∈ the set. Explanation: {mem_data.get('explanation','')}")
-                                else:
-                                    st.info(f"GPT: {member_q!r} ∉ the set. Explanation: {mem_data.get('explanation','')}")
-                            except Exception as e:
-                                st.error(f"Membership query failed: {e}")
-            else:
-                if 'Insufficient quota' in note:
-                    st.error("Not recognized as a valid set: insufficient quota for GPT-based validation. Please check your plan or use local parsing.")
-                else:
-                    st.error("Not recognized as a valid set: " + note)
+# if show_validator:
+#     st.sidebar.subheader("Set Definition Validator")
+#     user_def = st.text_input("Enter arbitrary set definition or description")
+#     if user_def:
+#         if not openai_api_key:
+#             st.error("Cannot validate via GPT because OPENAI_API_KEY is not configured.")
+#         else:
+#             with st.spinner("Interpreting set definition via ChatGPT..."):
+#                 result = interpret_set_definition_via_gpt(user_def)
+#             note = result.get("note", "")
+#             if result.get("valid"):
+#                 st.success("Recognized as a valid set definition.")
+#                 st.write("**Type:**", result.get("type"))
+#                 desc = result.get("description")
+#                 if desc:
+#                     st.write("**Description:**", desc)
+#                 elems = result.get("elements")
+#                 if elems is not None:
+#                     st.write("**Enumerated Elements:**", format_set(set(elems)))
+#                     test_val = st.text_input("Test membership: enter a value", key="membership_test")
+#                     if test_val:
+#                         tv = parse_element(test_val)
+#                         if tv in elems:
+#                             st.success(f"{tv!r} ∈ the set")
+#                         else:
+#                             st.info(f"{tv!r} ∉ the set")
+#                 else:
+#                     st.write("**Elements:** (Infinite or not enumerated)")
+#                     member_q = st.text_input("Test membership via GPT (enter a value)", key="gpt_member_test")
+#                     if member_q:
+#                         if 'Insufficient quota' in note:
+#                             st.error("Cannot perform membership query: insufficient quota.")
+#                         else:
+#                             prompt = (
+#                                 f"Determine if {member_q!r} is an element of the set defined by: {user_def!r}. Respond ONLY with JSON: { 'member': True/False, 'explanation': '...' }."  # noqa: E501
+#                             )
+#                             try:
+#                                 resp = openai.chat.completions.create(
+#                                     model="gpt-4o-mini",
+#                                     messages=[
+#                                         {"role": "system", "content": "You are a helpful assistant for set membership queries."},
+#                                         {"role": "user", "content": prompt}
+#                                     ],
+#                                     temperature=0.0,
+#                                     max_tokens=200,
+#                                 )
+#                                 content = resp.choices[0].message.content.strip()
+#                                 mem_data = json.loads(content)
+#                                 if mem_data.get("member"):
+#                                     st.success(f"GPT: {member_q!r} ∈ the set. Explanation: {mem_data.get('explanation','')}")
+#                                 else:
+#                                     st.info(f"GPT: {member_q!r} ∉ the set. Explanation: {mem_data.get('explanation','')}")
+#                             except Exception as e:
+#                                 st.error(f"Membership query failed: {e}")
+#             else:
+#                 if 'Insufficient quota' in note:
+#                     st.error("Not recognized as a valid set: insufficient quota for GPT-based validation. Please check your plan or use local parsing.")
+#                 else:
+#                     st.error("Not recognized as a valid set: " + note)
 
 # --- Footer ---
 st.markdown("---")
