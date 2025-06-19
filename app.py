@@ -148,7 +148,7 @@ def blend_colors_3(color1, color2, color3):
 st.sidebar.header("Configuration")
 show_venn = st.sidebar.checkbox("Enable Venn Diagram Operations", True)
 show_powerset = st.sidebar.checkbox("Enable Power Set Generator", False)
-show_slideshow = st.sidebar.checkbox("Enable Slideshow Viewer", False)
+# show_slideshow = st.sidebar.checkbox("Enable Slideshow Viewer", False)
 show_video = st.sidebar.checkbox("Set Theorums with Proof", False)
 show_validator = st.sidebar.checkbox("Enable Set Definition Validator", False)
 
