@@ -24,7 +24,7 @@ VIDEO_LIST = [
 
 # --- Streamlit App: Set Operations, Power Set, Slideshow & Video Viewer, Set Definition Validator ---
 st.set_page_config(page_title="Set Operations & Advanced Features", layout="wide")
-st.title("🔁 Interactive Set Operations, Power Set, Slideshow & Video Viewer & Set Definition Validator")
+st.title("🔁 Interactive Set Operations")
 
 # --- Helper Functions ---
 @st.cache_data
