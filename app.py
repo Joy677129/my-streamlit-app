@@ -19,7 +19,7 @@ except ImportError:
 # Add your videos here with their file paths (relative to app) and display titles
 VIDEO_LIST = [
     {"path": "videos/a(intS)b.mp4", "title": "n(AUB)=n(A)+n(B)-n(A∩B)"},
-     {"path": "videos/aub_vid.mp4", "title": "A∩B"},
+     #{"path": "videos/aub_vid.mp4", "title": "A∩B"},
 ]
 
 # --- Streamlit App: Set Operations, Power Set, Slideshow & Video Viewer, Set Definition Validator ---
