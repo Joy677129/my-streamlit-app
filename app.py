@@ -91,59 +91,59 @@ def blend_colors_3(color1, color2, color3):
     rgb3 = mcolors.to_rgb(color3)
     return tuple((c1 + c2 + c3) / 3 for c1, c2, c3 in zip(rgb1, rgb2, rgb3))
 
-# --- ChatGPT API Integration for Set Definition Parsing ---
-# openai_api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY", None)
-# if not openai_api_key:
-#     st.warning("OPENAI_API_KEY not found. GPT-based set definition validation will not work.")
-# else:
-#     openai.api_key = openai_api_key
+--- ChatGPT API Integration for Set Definition Parsing ---
+openai_api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY", None)
+if not openai_api_key:
+    st.warning("OPENAI_API_KEY not found. GPT-based set definition validation will not work.")
+else:
+    openai.api_key = openai_api_key
 
-# @st.cache_data(show_spinner=False)
-# def interpret_set_definition_via_gpt(user_input: str) -> dict:
-#     """Call ChatGPT API to parse arbitrary set definition, return dict with keys: valid, type, elements, description, note."""
-#     system_msg = "You are a helper that interprets mathematical set definitions given in arbitrary string form. Respond ONLY with valid JSON."
-#     examples = [
-#         {"input": "1, 2, 2, 3", "output": {"valid": True, "type": "roster", "elements": [1, 2, 3], "description": "Finite set with elements 1, 2, 3 (duplicates ignored)", "note": "Duplicates removed"}},
-#         {"input": "5-10", "output": {"valid": True, "type": "range", "elements": [5, 6, 7, 8, 9, 10], "description": "Integers from 5 to 10 inclusive", "note": ""}},
-#         {"input": "{ x | x is even and x < 10 }", "output": {"valid": True, "type": "predicate", "elements": [0, 2, 4, 6, 8], "description": "Even non-negative integers less than 10", "note": "Enumerated finite elements"}},
-#         {"input": "all primes", "output": {"valid": True, "type": "predicate", "elements": None, "description": "Set of all prime numbers", "note": "Infinite set; cannot enumerate fully"}},
-#         {"input": "{1, {2}}", "output": {"valid": False, "type": "invalid", "elements": None, "description": "", "note": "Nested sets not supported"}}
-#     ]
-#     messages = [{"role": "system", "content": system_msg}]
-#     for ex in examples:
-#         prompt_user = f"Input: \"{ex['input']}\"\nJSON:"
-#         messages.append({"role": "user", "content": prompt_user})
-#         messages.append({"role": "assistant", "content": json.dumps(ex['output'])})
-#     prompt_actual = f"Input: \"{user_input}\"\nJSON:"
-#     messages.append({"role": "user", "content": prompt_actual})
-#     try:
-#         resp = openai.chat.completions.create(
-#             model="gpt-4o-mini",
-#             messages=messages,
-#             temperature=0.0,
-#             max_tokens=512,
-#         )
-#         content = resp.choices[0].message.content.strip()
-#         data = json.loads(content)
-#         if not isinstance(data, dict) or 'valid' not in data:
-#             return {"valid": False, "type": "unknown", "elements": None, "description": "", "note": "Invalid response format"}
-#         elems = data.get("elements")
-#         if isinstance(elems, list):
-#             parsed = []
-#             for e in elems:
-#                 try:
-#                     parsed.append(int(e))
-#                 except Exception:
-#                     parsed.append(e)
-#             data["elements"] = parsed
-#         return data
-#     except Exception as e:
-#         err_str = str(e)
-#         if 'insufficient_quota' in err_str or 'quota' in err_str.lower():
-#             note = "Insufficient quota or quota exceeded. GPT-based validation unavailable."
-#         else:
-#             note = f"Error: {e}"
-#         return {"valid": False, "type": "error", "elements": None, "description": "", "note": note}
+@st.cache_data(show_spinner=False)
+def interpret_set_definition_via_gpt(user_input: str) -> dict:
+    """Call ChatGPT API to parse arbitrary set definition, return dict with keys: valid, type, elements, description, note."""
+    system_msg = "You are a helper that interprets mathematical set definitions given in arbitrary string form. Respond ONLY with valid JSON."
+    examples = [
+        {"input": "1, 2, 2, 3", "output": {"valid": True, "type": "roster", "elements": [1, 2, 3], "description": "Finite set with elements 1, 2, 3 (duplicates ignored)", "note": "Duplicates removed"}},
+        {"input": "5-10", "output": {"valid": True, "type": "range", "elements": [5, 6, 7, 8, 9, 10], "description": "Integers from 5 to 10 inclusive", "note": ""}},
+        {"input": "{ x | x is even and x < 10 }", "output": {"valid": True, "type": "predicate", "elements": [0, 2, 4, 6, 8], "description": "Even non-negative integers less than 10", "note": "Enumerated finite elements"}},
+        {"input": "all primes", "output": {"valid": True, "type": "predicate", "elements": None, "description": "Set of all prime numbers", "note": "Infinite set; cannot enumerate fully"}},
+        {"input": "{1, {2}}", "output": {"valid": False, "type": "invalid", "elements": None, "description": "", "note": "Nested sets not supported"}}
+    ]
+    messages = [{"role": "system", "content": system_msg}]
+    for ex in examples:
+        prompt_user = f"Input: \"{ex['input']}\"\nJSON:"
+        messages.append({"role": "user", "content": prompt_user})
+        messages.append({"role": "assistant", "content": json.dumps(ex['output'])})
+    prompt_actual = f"Input: \"{user_input}\"\nJSON:"
+    messages.append({"role": "user", "content": prompt_actual})
+    try:
+        resp = openai.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages,
+            temperature=0.0,
+            max_tokens=512,
+        )
+        content = resp.choices[0].message.content.strip()
+        data = json.loads(content)
+        if not isinstance(data, dict) or 'valid' not in data:
+            return {"valid": False, "type": "unknown", "elements": None, "description": "", "note": "Invalid response format"}
+        elems = data.get("elements")
+        if isinstance(elems, list):
+            parsed = []
+            for e in elems:
+                try:
+                    parsed.append(int(e))
+                except Exception:
+                    parsed.append(e)
+            data["elements"] = parsed
+        return data
+    except Exception as e:
+        err_str = str(e)
+        if 'insufficient_quota' in err_str or 'quota' in err_str.lower():
+            note = "Insufficient quota or quota exceeded. GPT-based validation unavailable."
+        else:
+            note = f"Error: {e}"
+        return {"valid": False, "type": "error", "elements": None, "description": "", "note": note}
 
 # --- Sidebar Configuration ---
 st.sidebar.header("Configuration")
