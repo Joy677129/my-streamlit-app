@@ -18,7 +18,7 @@ except ImportError:
 # --- Configuration: Hardcoded Videos ---
 # Add your videos here with their file paths (relative to app) and display titles
 VIDEO_LIST = [
-    {"path": "videos/a(intS)b.mp4", "title": "n(AUB)=n(A)+n(B)-n(A∩B)"},{"path": "aub(ints)c.mp4","title":"A∩(B∪C)=(A∩B)∪(A∩C)"}
+    {"path": "videos/a(intS)b.mp4", "title": "n(AUB)=n(A)+n(B)-n(A∩B)"},{"path": "videos/aub(ints)c.mp4","title":"A∩(B∪C)=(A∩B)∪(A∩C)"}
 
      #{"path": "videos/aub_vid.mp4", "title": "A∩B"},
 ]
