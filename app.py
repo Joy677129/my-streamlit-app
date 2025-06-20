@@ -18,13 +18,13 @@ except ImportError:
 # --- Configuration: Hardcoded Videos ---
 # Add your videos here with their file paths (relative to app) and display titles
 VIDEO_LIST = [
-    {"path": "videos/a(intS)b.mp4", "title": "n(AUB)=n(A)+n(B)-n(A∩B)"},{"path": "videos/a(int)bUC.mp4", "title": "A∩(B∪C)=(A∩B)∪(A∩C)"},
-
-     #{"path": "videos/aub_vid.mp4", "title": "A∩B"},
+    {"path": "videos/a(intS)b.mp4", "title": "n(AUB)=n(A)+n(B)-n(A∩B)"},
+    {"path": "videos/a(int)bUC.mp4", "title": "A∩(B∪C)=(A∩B)∪(A∩C)"},
+    # {"path": "videos/aub_vid.mp4", "title": "A∩B"},
 ]
 
 # --- Streamlit App: Set Operations, Power Set, Slideshow & Video Viewer, Set Definition Validator ---
-st.set_page_config(page_title="Set Operations & Advanced Features", layout="wide",initial_sidebar_state="expanded")
+st.set_page_config(page_title="Set Operations & Advanced Features", layout="wide", initial_sidebar_state="expanded")
 st.title("🔁 Interactive Set Operations")
 
 # --- Helper Functions ---
@@ -91,7 +91,7 @@ def blend_colors_3(color1, color2, color3):
     rgb3 = mcolors.to_rgb(color3)
     return tuple((c1 + c2 + c3) / 3 for c1, c2, c3 in zip(rgb1, rgb2, rgb3))
 
-# --- ChatGPT API Integration for Set Definition Parsing ---
+# --- ChatGPT API Integration for Set Definition Parsing (commented out) ---
 # openai_api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY", None)
 # if not openai_api_key:
 #     st.warning("OPENAI_API_KEY not found. GPT-based set definition validation will not work.")
@@ -150,25 +150,15 @@ st.sidebar.header("Configuration")
 show_venn = st.sidebar.checkbox("Enable Venn Diagram Operations", True)
 show_powerset = st.sidebar.checkbox("Enable Power Set Generator", False)
 # show_slideshow = st.sidebar.checkbox("Enable Slideshow Viewer", False)
-show_video = st.sidebar.checkbox("Set Theorums with Proof", False)
+show_video = st.sidebar.checkbox("Set Theorems with Proof", False)
 # show_validator = st.sidebar.checkbox("Enable Set Definition Validator", False)
 
 # --- Venn Diagram Section ---
 if show_venn:
     st.sidebar.subheader("Venn Diagram Settings")
+    # 1) Number of sets
     num_sets = st.sidebar.selectbox("Number of Sets for Venn Diagram", [2, 3], index=0)
-    default_examples = {2: ["2, 4, 6, 8", "3, 4, 5, 6, 9"], 3: ["1, 2, 3, 5", "2, 3, 4, 6", "1, 4, 5, 7"]}
-    A_input = st.sidebar.text_input("Set A elements (comma-separated)", value=default_examples[num_sets][0])
-    B_input = st.sidebar.text_input("Set B elements (comma-separated)", value=default_examples[num_sets][1])
-    C_input = None
-    if num_sets == 3:
-        C_input = st.sidebar.text_input("Set C elements (comma-separated)", value=default_examples[3][2])
-    color_A = st.sidebar.color_picker("Color for Set A", "#FF5733")
-    color_B = st.sidebar.color_picker("Color for Set B", "#33C1FF")
-    color_C = None
-    if num_sets == 3:
-        color_C = st.sidebar.color_picker("Color for Set C", "#75FF33")
-    U_input = st.sidebar.text_input("Universal Set (e.g., 1-10 or comma-separated)", value="1-10")
+    # 2) Immediately choose operation
     if num_sets == 2:
         operation = st.sidebar.selectbox(
             "Choose Operation (2 sets)", [
@@ -187,6 +177,20 @@ if show_venn:
                 "Complement of (A ∪ B ∪ C)", "Complement of (A ∩ B ∩ C)"
             ]
         )
+    # 3) Now the element inputs and other settings
+    default_examples = {2: ["2, 4, 6, 8", "3, 4, 5, 6, 9"], 3: ["1, 2, 3, 5", "2, 3, 4, 6", "1, 4, 5, 7"]}
+    A_input = st.sidebar.text_input("Set A elements (comma-separated)", value=default_examples[num_sets][0])
+    B_input = st.sidebar.text_input("Set B elements (comma-separated)", value=default_examples[num_sets][1])
+    C_input = None
+    if num_sets == 3:
+        C_input = st.sidebar.text_input("Set C elements (comma-separated)", value=default_examples[3][2])
+    color_A = st.sidebar.color_picker("Color for Set A", "#FF5733")
+    color_B = st.sidebar.color_picker("Color for Set B", "#33C1FF")
+    color_C = None
+    if num_sets == 3:
+        color_C = st.sidebar.color_picker("Color for Set C", "#75FF33")
+    U_input = st.sidebar.text_input("Universal Set (e.g., 1-10 or comma-separated)", value="1-10")
+
     A = parse_set(A_input)
     B = parse_set(B_input)
     C = parse_set(C_input) if num_sets == 3 else None
@@ -198,6 +202,7 @@ if show_venn:
         if missing:
             st.sidebar.error(f"Universal set missing elements: {format_set(missing)}. Complements may be incomplete.")
     result, highlight_ids = set(), []
+
     if show_venn and num_sets == 2:
         set1, set2 = A, B; colors = (color_A, color_B)
         if operation == "A ∪ B": result = A | B; highlight_ids = ['10','01','11']
@@ -244,6 +249,7 @@ if show_venn:
                         st.write(f"**{label}**: {format_set(subset)} {incl}")
             else:
                 st.info("Resulting set is empty (∅).")
+
     if show_venn and num_sets == 3:
         set1, set2, set3 = A, B, C; colors = (color_A, color_B, color_C)
         if operation == "A ∪ B ∪ C": result = A | B | C; highlight_ids=['100','010','001','110','101','011','111']
